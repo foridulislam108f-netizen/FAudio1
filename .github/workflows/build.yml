@@ -16,12 +16,16 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
 
-      # If you upload the project as a zip, it is unzipped automatically.
-      # If you upload the files directly, it builds them as they are.
+      # zip হিসেবে আপলোড করলে নিজে থেকে unzip করে নেবে; আর ফাইল আলাদা আপলোড করলে সরাসরি বিল্ড হবে
       - name: Find project
         run: |
           set -e
@@ -33,7 +37,7 @@ jobs:
           else
             SETTINGS=$(find . -maxdepth 3 -name settings.gradle -not -path './_proj/*' | head -n1)
           fi
-          if [ -z "$SETTINGS" ]; then echo "settings.gradle not found"; exit 1; fi
+          if [ -z "$SETTINGS" ]; then echo "settings.gradle পাওয়া যায়নি"; exit 1; fi
           echo "PROJECT_DIR=$(dirname "$SETTINGS")" >> $GITHUB_ENV
 
       - name: Build debug APK
